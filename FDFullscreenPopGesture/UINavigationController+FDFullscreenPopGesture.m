@@ -22,6 +22,7 @@
 
 #import "UINavigationController+FDFullscreenPopGesture.h"
 #import <objc/runtime.h>
+#import <MessageUI/MessageUI.h>
 
 @interface _FDFullscreenPopGestureRecognizerDelegate : NSObject <UIGestureRecognizerDelegate>
 
@@ -146,6 +147,15 @@ typedef void (^_FDViewControllerWillAppearInjectBlock)(UIViewController *viewCon
 
 - (void)fd_pushViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
+    //Special treatments for MFMessageComposeViewController
+    if ([self isKindOfClass:[MFMessageComposeViewController class]])
+    {
+        if (![self.viewControllers containsObject:viewController]) {
+            [self fd_pushViewController:viewController animated:animated];
+        }
+        return;
+    }
+  
     if (![self.interactivePopGestureRecognizer.view.gestureRecognizers containsObject:self.fd_fullscreenPopGestureRecognizer]) {
         
         // Add our own gesture recognizer to where the onboard screen edge pan gesture recognizer is attached to.
